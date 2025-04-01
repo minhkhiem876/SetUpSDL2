@@ -1,0 +1,11 @@
+[33mcommit 337fae70d1c6775e29a2bd0eb3825e7d8f994e67[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: minhkhiem876 <minhkhiem2k6@gmail.com>
+Date:   Tue Apr 1 13:05:16 2025 +0700
+
+    Add project files.
+
+[33mcommit dbf45c765aef8912b7ca49807ef0cddb28db65b4[m
+Author: minhkhiem876 <minhkhiem2k6@gmail.com>
+Date:   Tue Apr 1 13:03:13 2025 +0700
+
+    Add .gitattributes and .gitignore.
