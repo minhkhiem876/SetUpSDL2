@@ -1,4 +1,5 @@
 #include "Bullet.h" 
+#include <SDL.h>
 
 Bullet::Bullet(float startX_, float startY_, float velX_, float velY_) {
 	startX = startX_;

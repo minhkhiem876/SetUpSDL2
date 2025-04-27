@@ -9,6 +9,6 @@ public:
 
 	Bullet (float startX_, float startY_, float velX_, float velY_);
 	void updatePositionOfBullet();
-	void render (SDL_Renderer* renderBullet)
+	void render(SDL_Renderer* renderBullet);
 };
 #endif 

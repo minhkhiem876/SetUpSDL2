@@ -1,32 +1,69 @@
-﻿#include<SDL.h> 
+﻿#include<iostream>
+#include<SDL.h> 
+#include<SDL_image.h>
 #include<vector>
-#include<iostream>
-#include "Bullet.h"
-#include "Wall.h" 
-#include "Goal.h"
+//#include "Bullet.h"
+//#include "Wall.h" 
+//#include "Goal.h"
 using namespace std;
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 500;
 
 int main(int argc, char* args[]) {
 	// cần tạo tường, đạn, điểm đích, nhân vật 
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) { // sử dụng đồ họa và cửa sổ 
 		cout << "Không thể khởi tạo SDL!. SDL Error: " << SDL_GetError();
 		return -1;
 	}
 
-	SDL_Window* window = SDL_CreateWindow("Game Bắn Súng", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-	// para2, para3 chính là vị trí mà cửa sổ được khởi tạo. para5 để chắc chắn cửa sổ được hiển thị
-
-	// nếu tạo của sổ thất bại, window sẽ là nullptr do SDL_CreateWindow trả về
-	if (window == nullptr) {
-		cout << "Không thể tạo của sổ! SDL_Error: " << SDL_GetError();
-		SDL_DestroyWindow(window);
+	if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) { // img_init... trả về int, cụ thể là flag đại diện cho IMG_INIT_IMAGE.
+		cout << "Không thể khởi tạo SDL_image! SDL_image Error: " << IMG_GetError() << endl;
 		SDL_Quit();
 		return -1;
 	}
 
+	SDL_Window* window = SDL_CreateWindow("GunGoalGame", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	// para2, para3 chính là vị trí mà cửa sổ được khởi tạo. para5 để chắc chắn cửa sổ được hiển thị
 
+	// nếu tạo của sổ thất bại, window sẽ là nullptr do SDL_CreateWindow trả về
+	if (window == nullptr) {
+		cout << "Không thể tạo cửa sổ! SDL_Error: " << SDL_GetError();
+		SDL_DestroyWindow(window);
+		IMG_Quit();
+		SDL_Quit();
+		return -1;
+	}
+
+	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	if (renderer == nullptr) {
+		cout << "Không thể tạo được renderer! SDL_Error." << SDL_GetError() << endl;
+		SDL_DestroyWindow(window);
+		IMG_Quit();
+		SDL_Quit();
+		return -1;
+	}
+
+	SDL_Surface* loadedSurface = IMG_Load("C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/background.png");
+	if (loadedSurface == nullptr) {
+		cout << "Không thể load ảnh background! SDL_ImageError: " << IMG_GetError() << endl;
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
+		IMG_Quit();
+		SDL_Quit();
+		return -1;
+	}
+	
+	bool isRunning = true;
+	SDL_Event event;
+
+	while (isRunning) {
+		while (SDL_PollEvent(&event)) { // lấy sự kiện từ hàng đợi sự kiện và gán nó vào STRUCT event;
+			if (event.type == SDL_QUIT) {
+				isRunning = false;
+			}
+			SDL_Texture*
+		}
+	}
 }
 
