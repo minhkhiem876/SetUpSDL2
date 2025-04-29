@@ -2,9 +2,10 @@
 #include<SDL.h> 
 #include<SDL_image.h>
 #include<vector>
-//#include "Bullet.h"
-//#include "Wall.h" 
-//#include "Goal.h"
+#include "Bullet.h"
+#include "Wall.h" 
+#include "Goal.h"
+#include "Cannon.h"
 using namespace std;
 
 const int SCREEN_WIDTH = 800;
@@ -44,8 +45,8 @@ int main(int argc, char* args[]) {
 		return -1;
 	}
 
-	SDL_Surface* loadedSurface = IMG_Load("C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/background.png");
-	if (loadedSurface == nullptr) {
+	SDL_Surface* bgSurface = IMG_Load("C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/background.png");
+	if (bgSurface == nullptr) {
 		cout << "Không thể load ảnh background! SDL_ImageError: " << IMG_GetError() << endl;
 		SDL_DestroyRenderer(renderer);
 		SDL_DestroyWindow(window);
@@ -53,6 +54,19 @@ int main(int argc, char* args[]) {
 		SDL_Quit();
 		return -1;
 	}
+
+	SDL_Texture* bgTexture = SDL_CreateTextureFromSurface(renderer, bgSurface);
+	SDL_FreeSurface(bgSurface);
+	if (bgTexture == nullptr) {
+		std::cout << "Không thể tạo texture nền! Error: " << SDL_GetError() << std::endl;
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
+		IMG_Quit();
+		SDL_Quit();
+		return -1;
+	}
+
+	Cannon cannon(renderer, "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/Cannon.png", 200, 300, 150, 150);
 	
 	bool isRunning = true;
 	SDL_Event event;
@@ -62,7 +76,26 @@ int main(int argc, char* args[]) {
 			if (event.type == SDL_QUIT) {
 				isRunning = false;
 			}
-			SDL_Texture*
+			else if (event.type == SDL_KEYDOWN) {
+				switch (event.key.keysym.sym) {
+					case SDLK_LEFT:
+						cannon.move(-10);
+						break;
+					case SDLK_RIGHT:
+						cannon.move(10);
+						break;
+					case SDLK_DOWN:
+						cannon.rotate(2.0);
+						break;
+					case SDLK_UP:
+						cannon.rotate(-2.0);
+						break;
+				}
+			}
+			SDL_RenderClear(renderer);          // Xóa màn hình
+			SDL_RenderCopy(renderer, bgTexture, NULL, NULL); // Vẽ background
+			cannon.render(renderer);            // Vẽ khẩu pháo
+			SDL_RenderPresent(renderer);        // Cập nhật màn hình
 		}
 	}
 }
