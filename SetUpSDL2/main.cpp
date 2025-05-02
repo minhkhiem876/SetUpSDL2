@@ -5,7 +5,7 @@
 #include "Bullet.h"
 #include "Wall.h" 
 #include "Goal.h"
-#include "Cannon.h"
+#include "Bird.h"
 using namespace std;
 
 const int SCREEN_WIDTH = 800;
@@ -24,7 +24,7 @@ int main(int argc, char* args[]) {
 		return -1;
 	}
 
-	SDL_Window* window = SDL_CreateWindow("GunGoalGame", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	SDL_Window* window = SDL_CreateWindow("Flappy Bird	", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 	// para2, para3 chính là vị trí mà cửa sổ được khởi tạo. para5 để chắc chắn cửa sổ được hiển thị
 
 	// nếu tạo của sổ thất bại, window sẽ là nullptr do SDL_CreateWindow trả về
@@ -66,7 +66,7 @@ int main(int argc, char* args[]) {
 		return -1;
 	}
 
-	Cannon cannon(renderer, "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/Cannon.png", 200, 300, 150, 150);
+	Bird bird(renderer, "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/Cannon.png", 200, 300, 150, 150);
 	
 	bool isRunning = true;
 	SDL_Event event;
@@ -76,26 +76,12 @@ int main(int argc, char* args[]) {
 			if (event.type == SDL_QUIT) {
 				isRunning = false;
 			}
-			else if (event.type == SDL_KEYDOWN) {
-				switch (event.key.keysym.sym) {
-					case SDLK_LEFT:
-						cannon.move(-10);
-						break;
-					case SDLK_RIGHT:
-						cannon.move(10);
-						break;
-					case SDLK_DOWN:
-						cannon.rotate(2.0);
-						break;
-					case SDLK_UP:
-						cannon.rotate(-2.0);
-						break;
-				}
+			else if (event.type == SDL_
 			}
-			SDL_RenderClear(renderer);          // Xóa màn hình
-			SDL_RenderCopy(renderer, bgTexture, NULL, NULL); // Vẽ background
-			cannon.render(renderer);            // Vẽ khẩu pháo
-			SDL_RenderPresent(renderer);        // Cập nhật màn hình
+			SDL_RenderClear(renderer);          
+			SDL_RenderCopy(renderer, bgTexture, NULL, NULL); 
+			bird.render(renderer);            
+			SDL_RenderPresent(renderer);       
 		}
 	}
 }
