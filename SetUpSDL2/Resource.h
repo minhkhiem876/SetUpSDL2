@@ -3,9 +3,10 @@
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 550;
+const int pipeSpeed = 5;
 const char* WINDOW_TITLE = "Flappy Bird";
 
-const char* FOREST_BACKGROUND = ;
+const char* SKY_BACKGROUND = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/background.png";
 const char* PIED_PIPE = "img/pipe-green.png";
 
 #endif 
