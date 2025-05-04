@@ -17,7 +17,7 @@ Pipe::Pipe() {
 	pipeW = 0;
 	pipeH = 0;
 	pipeDistance = 250;
-	scoreMeter = 0;
+	bool hasPassed = false;
 	passHole = 150;
 	vector<vector<int>> pos_pipes(rows, vector<int>(cols));
 }

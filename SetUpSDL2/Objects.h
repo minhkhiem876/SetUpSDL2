@@ -16,7 +16,7 @@ struct Bird {
 struct Pipe {
 	int pipeX, pipe1Y, pipe2Y, pipeW, pipeH, pipeDistance, passHole;
 	bool hasPassed;
-	const int rows = 4, cols = 3;
+	static const int rows = 4, cols = 3;
 	vector<vector<int>> pos_pipes;
 	Pipe();
 	void randomPositionGenerator();

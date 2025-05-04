@@ -1,6 +1,7 @@
 #include "Graphics.h"
 #include "Resource.h"
-
+#include<SDL.h>
+using namespace std;
 void ScrollingBackground::setTexture(SDL_Texture* _texture) {
 	texture = _texture;
 	SDL_QueryTexture(texture, NULL, NULL, &width, &height);
@@ -50,6 +51,7 @@ SDL_Texture* Graphics::loadTexture(const char* filename) {
 	SDL_Texture* texture = IMG_LoadTexture(renderer, filename);
 	if (!texture) {
 		SDL_Log("LoadTexture ERROR: ", SDL_GetError());
+		return nullptr;
 	}
 	return texture;
 }
@@ -61,14 +63,14 @@ void Graphics::renderTexture(SDL_Texture* texture, int x, int y) {
 	SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
 	SDL_RenderCopy(renderer, texture, NULL, &dest);
 }
-// dest là hình ch? nh?t mà texture ???c v? trên renderer
-// texture luôn ???c l?y toàn ph?n 
+// dest là hình chu nhat mà texture duoc ve trên renderer
+// texture luôn duoc lay toan phan 
 
 void Graphics::renderScrollBg(const ScrollingBackground& bgr) {
 	renderTexture(bgr.texture, bgr.scrollingOffSet, 0);
 	renderTexture(bgr.texture, bgr.scrollingOffSet + bgr.width, 0);
 }
-// nh?ng ph?n nào ra ngoài window thì s? b? c?t b?;
+
 
 void Graphics::quit() {
 	SDL_DestroyRenderer(renderer);
