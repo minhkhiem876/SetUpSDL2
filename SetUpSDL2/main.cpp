@@ -1,28 +1,57 @@
-﻿#include <iostream>
-#include <SDL.h> 
-#include <SDL_image.h>
-#include <vector>
-#include "Graphics.h"
+﻿#include "Graphics.h"
 #include "Objects.h"
-#include <ctime>
-using namespace std;
-
+#include "Logic.h"
+#include "Resource.h"
 
 int main(int argc, char* argv[]) {
-	Graphics graphics;
-	graphics.init();
+    SDL_Init(SDL_INIT_EVERYTHING);
+    IMG_Init(IMG_INIT_PNG);
 
-	SDL_Texture* bgTexture = graphics.loadTexture(SKY_BACKGROUND_PATH);
-	SDL_Texture* pipeTexture = graphics.loadTexture(PIPE_PATH);
+    Graphics graphics;
+    graphics.init();
 
-	ScrollingBackground background;
-	background.setTexture(bgTexture);
+    SDL_Texture* background = graphics.loadTexture(SKY_BACKGROUND_PATH);
+    SDL_Texture* birdTex = graphics.loadTexture(BIRD_PATH);
+    SDL_Texture* pipeTex = graphics.loadTexture(PIPE_PATH);
 
-	Pipe pipe;
-	SDL_QueryTexture(pipeTexture, NULL, NULL, &pipe.pipeW, &pipe.pipeH);
-	srand(time(NULL));
-	
-	for (int i = 0; i < Pipe::rows; i++) {
+    Bird bird;
+    Pipe pipes;
+    startGameSetUp(pipes);
 
-	}
+    waitUntilKeyPressed(); // chờ người chơi bấm phím bắt đầu
+
+    bool quit = false;
+    SDL_Event e;
+
+    while (!quit) {
+        const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+        SDL_PollEvent(&e);
+        if (e.type == SDL_QUIT) {
+            quit = true;
+        }
+
+        // Cập nhật logic chim bay
+        birdFly(currentKeyStates, quit, bird);
+
+        // Vẽ nền
+        graphics.prepareScene(background);
+
+        // Vẽ ống
+        pipeRunning(pipes, graphics, pipeTex, pipeSpeed, true);
+
+        // Vẽ chim
+        graphics.renderTexture(birdTex, bird.birdPosX, bird.birdPosY);
+
+        // Kiểm tra va chạm
+        checkCollision(pipes, bird, quit);
+
+        graphics.presentScene();
+        SDL_Delay(16); // ~60 FPS
+    }
+
+    graphics.quit();
+    SDL_Quit();
+    IMG_Quit();
+
+    return 0;
 }

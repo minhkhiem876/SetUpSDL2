@@ -12,6 +12,7 @@ struct ScrollingBackground {
 	int width, height;
 
 	void setTexture(SDL_Texture* _texture);
+
 	void scroll(int distance);
 };
 
@@ -20,15 +21,23 @@ struct Graphics {
 	SDL_Window* window;
 
 	void init();
-	void prepareScene(SDL_Texture* background);
-	void presentScene();
-	SDL_Texture* loadTexture(const char* filename);
-	void renderTexture(SDL_Texture* texture, int x, int y);
-	void renderScrollBg(const ScrollingBackground& bg);
-	void quit();
+
+	void prepareScene(SDL_Texture* background) const;
+
+	void prepareSceneNoBg() const;
+
+	void presentScene() const;
+
+	SDL_Texture* loadTexture(const char* filename) const;
+
+	void renderTexture(SDL_Texture* texture, int x, int y) const;
+
+	void advancedRenderTexture(SDL_Texture* texture, int x, int y, SDL_RendererFlip flipType) const;
+
+	void renderScrollBg(const ScrollingBackground& bg) const;
+
+	void quit() const;
+
 };
-
-
-
 
 #endif

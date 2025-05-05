@@ -1,12 +1,14 @@
-#ifndef _DEFS__H
-#define _DEFS__H
+#ifndef RESOURCE_H
+#define RESOURCE_H
 
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 550;
-const int pipeSpeed = 5;
-const char* WINDOW_TITLE = "Flappy Bird";
+extern const int SCREEN_WIDTH;
+extern const int SCREEN_HEIGHT;
+extern const int pipeSpeed;
+extern const int distanceScroll;
 
-const char* SKY_BACKGROUND_PATH = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/background.png";
-const char* PIPE_PATH = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/pipe.png";
+extern const char* WINDOW_TITLE;
+extern const char* SKY_BACKGROUND_PATH;
+extern const char* PIPE_PATH;
+extern const char* BIRD_PATH;
 
 #endif 

@@ -1,11 +1,19 @@
 #ifndef LOGIC_H
 #define LOGIC_H
+#include <iostream>
 #include "Objects.h"
+#include "Resource.h"
+#include "Graphics.h"
 
-void updateBird(Bird& bird);
+void waitUntilKeyPressed();
 
-bool checkCollision(const Bird& bird, const Pipe& pipes);
+void birdFly(const Uint8* currentKeyStated, bool& game, Bird& bird);
 
-void updatePipes(Pipe& pipes, Bird& bird);
+void pipeRunning(Pipe& pipes, Graphics& graphics, SDL_Texture* pipe, int speed, bool gen);
 
+void startGameSetUp(Pipe& pipes);
+
+void resetGame(Bird& bird);
+
+void checkCollision(Pipe& pipes, Bird& bird, bool& quit);
 #endif 
