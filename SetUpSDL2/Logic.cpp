@@ -1,6 +1,7 @@
 #include "Logic.h"
 #include <iostream>
 #include <SDL.h>
+#include<vector>
 #include "Resource.h"
 void waitUntilKeyPressed()
 {
@@ -47,14 +48,14 @@ void birdFly(const Uint8* currentKeyStated, bool& game, Bird& bird) {
 void pipeRunning(Pipe& pipes, Graphics& graphics, SDL_Texture* pipe, int pipeSpeed, bool gen) {
 	for (int i = 0; i < 4; i++) {
 		pipes.pos_pipes[i][0] -= pipeSpeed;
+		graphics.advancedRenderTexture(pipe, pipes.pos_pipes[i][0], pipes.pos_pipes[i][2], SDL_FLIP_VERTICAL);
 		graphics.renderTexture(pipe, pipes.pos_pipes[i][0], pipes.pos_pipes[i][1]);
-		graphics.advancedRenderTexture(pipe, pipes.pos_pipes[i][0], pipes.pos_pipes[i][1], SDL_FLIP_HORIZONTAL);
 		if (pipes.pos_pipes[i][1] + pipes.pipeH < SCREEN_HEIGHT) {
-			graphics.renderTexture(pipe, pipes.pos_pipes[i][0], pipes.pos_pipes[i][1] + pipes.pipeH);
+			graphics.advancedRenderTexture(pipe, pipes.pos_pipes[i][0], pipes.pos_pipes[i][1] + pipes.pipeH, SDL_FLIP_VERTICAL);
 		}
 
 		if (pipes.pos_pipes[i][2] > 0) {
-			graphics.advancedRenderTexture(pipe, pipes.pos_pipes[i][0], pipes.pos_pipes[i][2] - pipes.pipeH, SDL_FLIP_HORIZONTAL);
+			graphics.renderTexture(pipe, pipes.pos_pipes[i][0], pipes.pos_pipes[i][2] - pipes.pipeH);
 		}
 	}
 
@@ -95,7 +96,7 @@ void resetGame(Bird& bird) {
 	bird.fly = false;
 }
 
-void checkCollision(Pipe& pipes, Bird& bird, bool& quit) {
+void checkCollision(Pipe& pipes, Bird& bird, bool& game) {
 	int boundingPosX1 = bird.birdPosX, boundingPosY1 = bird.birdPosY;
 	int boundingPosX2 = boundingPosX1 + bird.widthBird, boundingPosY2 = boundingPosY1 + bird.heightBird;
 
@@ -107,12 +108,16 @@ void checkCollision(Pipe& pipes, Bird& bird, bool& quit) {
 	for (int i = 0; i < 4; i++) {
 		if (pipes.pos_pipes[i][0] < boundingPosX2 && pipes.pos_pipes[i][0] + pipes.pipeW > boundingPosX1) {
 			if (boundingPosY2 > pipes.pos_pipes[i][1] || boundingPosY1 < pipes.pos_pipes[i][2] + pipes.pipeH) {
-				quit = true;
+				game = false;
 			}
 		}
 	}
 
+	if (boundingPosY1 < 0) {
+		game = false;
+	}
+
 	if (boundingPosY2 > SCREEN_HEIGHT) {
-		quit = true;
+		game = false;
 	}
 }

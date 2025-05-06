@@ -1,8 +1,8 @@
 #include "Resource.h" 
 #include <iostream>
 
-const int SCREEN_WIDTH = 1000;
-const int SCREEN_HEIGHT = 800;
+const int SCREEN_WIDTH = 900;
+const int SCREEN_HEIGHT = 563;
 const int pipeSpeed = 5;
 const int distanceScroll = 2;
 

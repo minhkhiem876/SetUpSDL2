@@ -1,5 +1,6 @@
 #include "Objects.h"
 #include "Resource.h"
+#include <vector>
 #include <cstdlib>
 
 Bird::Bird() {

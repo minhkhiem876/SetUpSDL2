@@ -73,7 +73,7 @@ void Graphics::advancedRenderTexture(SDL_Texture* texture, int x, int y, SDL_Ren
 	dest.y = y;
 
 	SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
-	SDL_RenderCopyEx(renderer, texture, NULL, &dest, 180, NULL, flipType);
+	SDL_RenderCopyEx(renderer, texture, NULL, &dest, 0, NULL, flipType);
 }
 
 void Graphics::renderScrollBg(const ScrollingBackground& bgr) const {

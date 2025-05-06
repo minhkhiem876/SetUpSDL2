@@ -15,5 +15,5 @@ void startGameSetUp(Pipe& pipes);
 
 void resetGame(Bird& bird);
 
-void checkCollision(Pipe& pipes, Bird& bird, bool& quit);
+void checkCollision(Pipe& pipes, Bird& bird, bool& game);
 #endif 
