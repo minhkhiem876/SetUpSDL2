@@ -18,10 +18,12 @@ int main(int argc, char* agrv[]) {
 	SDL_Texture* birdTexture = graphics.loadTexture(BIRD_PATH);
 	SDL_Texture* pipeTexture = graphics.loadTexture(PIPE_PATH);
 
+	AnimationBird aniBird;
 	Bird bird;
 	Pipe pipes;
 	SDL_QueryTexture(pipeTexture, NULL, NULL, &pipes.pipeW, &pipes.pipeH);
 	SDL_QueryTexture(birdTexture, NULL, NULL, &bird.widthBird, &bird.heightBird);
+	aniBird.loadFrame(graphics.renderer);
 
 	srand(time(NULL));
 	bool quit = false, prepareGame = true, firstPlay = true, game = false;
@@ -50,7 +52,8 @@ int main(int argc, char* agrv[]) {
 			if (firstPlay) {
 				graphics.prepareSceneNoBg();
 				graphics.renderScrollBg(background);
-				graphics.renderTexture(birdTexture, bird.birdPosX, bird.birdPosY);
+				aniBird.updateBirdAnimation();
+				graphics.renderTextureAngle(aniBird.birdFrames[aniBird.currentFrame], bird);
 			}
 			else {
 				pipeRunning(pipes, graphics, pipeTexture, 0, false);
@@ -70,8 +73,9 @@ int main(int argc, char* agrv[]) {
 			graphics.renderScrollBg(background);
 
 			pipeRunning(pipes, graphics, pipeTexture, pipeSpeed, true);
-			birdFly(currentKeyStates, game, bird);
-			graphics.renderTexture(birdTexture, bird.birdPosX, bird.birdPosY);
+			birdFly(currentKeyStates, bird);
+			aniBird.updateBirdAnimation();
+			graphics.renderTextureAngle(aniBird.birdFrames[aniBird.currentFrame], bird);
 			checkCollision(pipes, bird, game);
 		}
 		graphics.presentScene();

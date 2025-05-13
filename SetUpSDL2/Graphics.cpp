@@ -1,6 +1,7 @@
 #include "Graphics.h"
 #include "Resource.h"
-#include<SDL.h>
+#include <SDL.h>
+#include "Objects.h"
 using namespace std;
 void ScrollingBackground::setTexture(SDL_Texture* _texture) {
 	texture = _texture;
@@ -66,6 +67,15 @@ void Graphics::renderTexture(SDL_Texture* texture, int x, int y) const {
 }
 // dest là hình chu nhat mà texture duoc ve trên renderer
 // texture luôn duoc lay toan phan 
+
+void Graphics::renderTextureAngle(SDL_Texture* texture, Bird& bird) {
+	SDL_Rect dest;
+	dest.x = bird.birdPosX;
+	dest.y = bird.birdPosY;
+	SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
+	SDL_Point center = { dest.w / 2, dest.h / 2 };
+	SDL_RenderCopyEx(renderer, texture, nullptr, &dest, bird.birdAngle, &center, SDL_FLIP_NONE);
+}
 
 void Graphics::advancedRenderTexture(SDL_Texture* texture, int x, int y, SDL_RendererFlip flipType) const {
 	SDL_Rect dest;

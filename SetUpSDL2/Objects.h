@@ -2,13 +2,20 @@
 #define OBJECTS_H
 #include <iostream>
 #include <SDL.h>
+#include "Resource.h"
 #include <SDL_image.h>
 #include <vector>
 using namespace std;
 
+
 struct Bird {
-	int birdPosX, birdPosY, flyUp, timeAccel, score, widthBird, heightBird;
-	bool fly;
+	const float MAX_ANGLE = 90.0f;
+	const float MIN_ANGLE = - 25.0f;
+	const float ANGLE_FALL_SPEED = 2.0f;
+	const int MAX_DROP_SPEED = 10;
+
+	int birdPosX, birdPosY, vel, score, widthBird, heightBird;
+	float birdAngle;
 	Bird();
 };
 
@@ -21,4 +28,15 @@ struct Pipe {
 	void randomPositionGenerator();
 };
 
+struct AnimationBird {
+	static const int BIRD_FLY_FRAME_COUNT = 8;
+	static const int FRAME_DELAY = 100;
+	SDL_Texture* birdFrames[BIRD_FLY_FRAME_COUNT];
+	int currentFrame;;
+	Uint32 lastFrameTime;
+	
+	AnimationBird();
+	void loadFrame(SDL_Renderer* renderer);
+	void updateBirdAnimation();
+};
 #endif

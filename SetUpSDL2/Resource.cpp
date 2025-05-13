@@ -6,9 +6,10 @@ const int SCREEN_HEIGHT = 563;
 const int pipeSpeed = 3;
 const int distanceScroll = 2;
 const int PIPE_DISTANCE = 300;
-const int FALL_SPEED = 3;
+const int FALL_SPEED = 8;
 
-const char* WINDOW_TITLE = "Flappy Bird";
+
+const char* WINDOW_TITLE = "Fly Bird";
 const char* SKY_BACKGROUND_PATH = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/background.png";
 const char* PIPE_PATH = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/pipe.png";
 const char* BIRD_PATH = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/Bird.png";

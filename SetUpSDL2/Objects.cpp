@@ -2,17 +2,18 @@
 #include "Resource.h"
 #include <vector>
 #include <cstdlib>
+#include <string>
+
 using namespace std;
 
 Bird::Bird() {
+	birdAngle = 0.0f;
 	widthBird = 0;
 	heightBird = 0;
 	birdPosX = SCREEN_WIDTH / 5;
 	birdPosY = SCREEN_HEIGHT / 3; 
-	flyUp = 0;
-	timeAccel = 0;
+	vel = 0;
 	score = 0;
-	fly = false;
 }
 
 Pipe::Pipe() {
@@ -31,6 +32,32 @@ void Pipe::randomPositionGenerator() {
 	pipe1Y = (rand() % (SCREEN_HEIGHT - passHole + 1)) + passHole;
 	pipe2Y = pipe1Y - passHole - pipeH;
 }
+
+AnimationBird :: AnimationBird() {
+	currentFrame = 0;
+	lastFrameTime = 0;
+}
+
+void AnimationBird::loadFrame (SDL_Renderer* renderer){
+	for (int i = 0; i < BIRD_FLY_FRAME_COUNT; i++) {
+		string path = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/animationBird/Bird_" + to_string(i) + ".png";
+		birdFrames[i] = IMG_LoadTexture(renderer, path.c_str());
+		if (!birdFrames[i]) {
+			SDL_Log("Failed to lead bird frame: %s", SDL_GetError());
+			return;
+		}
+	}
+}
+
+void AnimationBird :: updateBirdAnimation() {
+	Uint32 currentTime = SDL_GetTicks();
+	if (currentTime > lastFrameTime + FRAME_DELAY) {
+		currentFrame = (currentFrame + 1) % BIRD_FLY_FRAME_COUNT;
+		lastFrameTime = currentTime;
+	}
+}
+
+
 
 
 

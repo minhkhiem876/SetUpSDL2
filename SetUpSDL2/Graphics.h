@@ -1,9 +1,10 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include<SDL.h>
-#include<SDL_image.h>
-#include<vector>
+#include <SDL.h>
+#include "Objects.h"
+#include <SDL_image.h>
+#include <vector>
 using namespace std;
 
 struct ScrollingBackground {
@@ -31,6 +32,8 @@ struct Graphics {
 	SDL_Texture* loadTexture(const char* filename) const;
 
 	void renderTexture(SDL_Texture* texture, int x, int y) const;
+
+	void renderTextureAngle(SDL_Texture* texture, Bird& bird);
 
 	void advancedRenderTexture(SDL_Texture* texture, int x, int y, SDL_RendererFlip flipType) const;
 

@@ -5,9 +5,7 @@
 #include "Resource.h"
 #include "Graphics.h"
 
-void waitUntilKeyPressed();
-
-void birdFly(const Uint8* currentKeyStated, bool& game, Bird& bird);
+void birdFly(const Uint8* currentKeyStated, Bird& bird);
 
 void pipeRunning(Pipe& pipes, Graphics& graphics, SDL_Texture* pipe, const int pipeSpeed, bool gen);
 

@@ -1,45 +1,30 @@
-#include "Logic.h"
+﻿#include "Logic.h"
 #include <iostream>
 #include <SDL.h>
-#include<vector>
+#include <vector>
 #include "Resource.h"
-void waitUntilKeyPressed()
-{
-	SDL_Event e;
-	while (true) {
-		if (SDL_PollEvent(&e) != 0 &&
-			(e.type == SDL_KEYDOWN || e.type == SDL_QUIT))
-			return;
-		SDL_Delay(100);
-	}
-}
+using namespace std;
 
-void birdFly(const Uint8* currentKeyStated, bool& game, Bird& bird) {
+void birdFly(const Uint8* currentKeyStated, Bird& bird) {
 	if (currentKeyStated[SDL_SCANCODE_SPACE]) {
-		bird.fly = true;
-		bird.timeAccel = FALL_SPEED;
+		bird.vel = - FALL_SPEED;
+		bird.birdAngle = bird.MIN_ANGLE;
 	}
 
-	if (bird.fly) {
-		if (bird.timeAccel >= 0) {
-			bird.timeAccel--;
-		}
-		if (currentKeyStated[SDL_SCANCODE_SPACE]) {
-			bird.timeAccel = FALL_SPEED;
-		}
+	bird.vel += 1;
+	if (bird.vel > bird.MAX_DROP_SPEED) {
+		bird.vel = bird.MAX_DROP_SPEED;
+	}
+	bird.birdPosY += bird.vel;
 
-		bird.birdPosY -= bird.timeAccel;
-
-		if (bird.timeAccel == 0) {
-			bird.fly = false;
+	if (bird.vel >= 0) {
+		bird.birdAngle += bird.ANGLE_FALL_SPEED;
+		if (bird.birdAngle > bird.MAX_ANGLE) {
+			bird.birdAngle = bird.MAX_ANGLE;
 		}
 	}
-
-	if (!bird.fly) {
-		if (bird.timeAccel <= 2 * FALL_SPEED) {
-			bird.timeAccel++;
-		}
-		bird.birdPosY += 2 * bird.timeAccel;
+	else {
+		bird.birdAngle = bird.MIN_ANGLE;
 	}
 }
 
@@ -88,10 +73,9 @@ void startGameSetUp(Pipe& pipes) {
 void resetGame(Bird& bird) {
 	cout << "Score: " << bird.score << endl;
 	bird.birdPosX = SCREEN_WIDTH / 5;
-	bird.birdPosY = SCREEN_HEIGHT / 3;
-	bird.timeAccel = 0;
+	bird.birdPosY = SCREEN_HEIGHT /3;
+	bird.vel = 0;
 	bird.score = 0;
-	bird.fly = false;
 }
 
 void checkCollision(Pipe& pipes, Bird& bird, bool& game) {
