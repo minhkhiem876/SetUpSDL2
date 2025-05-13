@@ -21,19 +21,20 @@ int main(int argc, char* agrv[]) {
 	Bird bird;
 	Pipe pipes;
 	SDL_QueryTexture(pipeTexture, NULL, NULL, &pipes.pipeW, &pipes.pipeH);
+	SDL_QueryTexture(birdTexture, NULL, NULL, &bird.widthBird, &bird.heightBird);
 
 	srand(time(NULL));
-	bool quit = false, start = true, firstPlay = true, game = false;
+	bool quit = false, prepareGame = true, firstPlay = true, game = false;
 	int highScore = 0, timer = 0;
 
 	SDL_Event event;
 	while (!quit) {
 		while (SDL_PollEvent(&event)) {
-			if (event.type == SDL_QUIT) 
+			if (event.type == SDL_QUIT)
 				quit = true;
-			else if (event.type == SDL_KEYDOWN && start) {
+			else if (event.type == SDL_KEYDOWN && prepareGame) {
 				if (event.key.keysym.sym == SDLK_SPACE) {
-					start = false;
+					prepareGame = false;
 					resetGame(bird);
 					startGameSetUp(pipes);
 					game = true;
@@ -54,7 +55,10 @@ int main(int argc, char* agrv[]) {
 			else {
 				pipeRunning(pipes, graphics, pipeTexture, 0, false);
 				timer += 10;
-				if (timer == 100) start = true;
+				if (timer == 200) {
+					prepareGame = true;
+					timer = 0;
+				}
 			}
 		}
 
@@ -65,10 +69,10 @@ int main(int argc, char* agrv[]) {
 			background.scroll(1);
 			graphics.renderScrollBg(background);
 
-			pipeRunning(pipes, graphics, pipeTexture, 10, true);
+			pipeRunning(pipes, graphics, pipeTexture, pipeSpeed, true);
 			birdFly(currentKeyStates, game, bird);
+			graphics.renderTexture(birdTexture, bird.birdPosX, bird.birdPosY);
 			checkCollision(pipes, bird, game);
-
 		}
 		graphics.presentScene();
 	}

@@ -17,8 +17,7 @@ void waitUntilKeyPressed()
 void birdFly(const Uint8* currentKeyStated, bool& game, Bird& bird) {
 	if (currentKeyStated[SDL_SCANCODE_SPACE]) {
 		bird.fly = true;
-		bird.timeAccel = 5;
-
+		bird.timeAccel = FALL_SPEED;
 	}
 
 	if (bird.fly) {
@@ -26,10 +25,10 @@ void birdFly(const Uint8* currentKeyStated, bool& game, Bird& bird) {
 			bird.timeAccel--;
 		}
 		if (currentKeyStated[SDL_SCANCODE_SPACE]) {
-			bird.timeAccel = 5;
+			bird.timeAccel = FALL_SPEED;
 		}
 
-		bird.birdPosY -= 4 * bird.timeAccel;
+		bird.birdPosY -= bird.timeAccel;
 
 		if (bird.timeAccel == 0) {
 			bird.fly = false;
@@ -37,15 +36,14 @@ void birdFly(const Uint8* currentKeyStated, bool& game, Bird& bird) {
 	}
 
 	if (!bird.fly) {
-		if (bird.timeAccel <= 10) {
+		if (bird.timeAccel <= 2 * FALL_SPEED) {
 			bird.timeAccel++;
 		}
-
-		bird.birdPosY += 5 * bird.timeAccel;
+		bird.birdPosY += 2 * bird.timeAccel;
 	}
 }
 
-void pipeRunning(Pipe& pipes, Graphics& graphics, SDL_Texture* pipe, int pipeSpeed, bool gen) {
+void pipeRunning(Pipe& pipes, Graphics& graphics, SDL_Texture* pipe, const int pipeSpeed, bool gen) {
 	for (int i = 0; i < 4; i++) {
 		pipes.pos_pipes[i][0] -= pipeSpeed;
 		graphics.advancedRenderTexture(pipe, pipes.pos_pipes[i][0], pipes.pos_pipes[i][2], SDL_FLIP_VERTICAL);
@@ -102,22 +100,28 @@ void checkCollision(Pipe& pipes, Bird& bird, bool& game) {
 
 	if ((boundingPosX1 + boundingPosX2) / 2 > pipes.scoreMeter) {
 		bird.score += 1;
-		pipes.scoreMeter = pipes.pipeW + pipes.pipeDistance;
+		pipes.scoreMeter += pipes.pipeW + pipes.pipeDistance;
 	}
 
+	SDL_Rect birdRect = { bird.birdPosX, bird.birdPosY, bird.widthBird, bird.heightBird };
+
 	for (int i = 0; i < 4; i++) {
-		if (pipes.pos_pipes[i][0] < boundingPosX2 && pipes.pos_pipes[i][0] + pipes.pipeW > boundingPosX1) {
-			if (boundingPosY2 > pipes.pos_pipes[i][1] || boundingPosY1 < pipes.pos_pipes[i][2] + pipes.pipeH) {
-				game = false;
-			}
+		SDL_Rect pipe1Rect = { pipes.pos_pipes[i][0], pipes.pos_pipes[i][1], pipes.pipeW, pipes.pipeH };
+		SDL_Rect pipe2Rect = { pipes.pos_pipes[i][0], pipes.pos_pipes[i][2], pipes.pipeW, pipes.pipeH };
+	
+		if (SDL_HasIntersection(&birdRect, &pipe1Rect) || SDL_HasIntersection(&birdRect, &pipe2Rect)) {
+			game = false;
+			return;
 		}
 	}
 
 	if (boundingPosY1 < 0) {
 		game = false;
+		return;
 	}
 
 	if (boundingPosY2 > SCREEN_HEIGHT) {
 		game = false;
+		return;
 	}
 }

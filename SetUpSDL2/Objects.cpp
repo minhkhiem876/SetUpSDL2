@@ -2,6 +2,7 @@
 #include "Resource.h"
 #include <vector>
 #include <cstdlib>
+using namespace std;
 
 Bird::Bird() {
 	widthBird = 0;
@@ -20,7 +21,7 @@ Pipe::Pipe() {
 	pipe2Y = 0;
 	pipeW = 0;
 	pipeH = 0;
-	pipeDistance = 250;
+	pipeDistance = PIPE_DISTANCE;
 	scoreMeter = 0;
 	passHole = 150;
 	pos_pipes = vector<vector<int>>(rows, vector<int>(cols));
