@@ -26,6 +26,9 @@ int main(int argc, char* agrv[]) {
 	AnimationBird aniBird;
 	Bird bird;
 	Pipe pipes;
+	Menu menu;
+	menu.loadFonts(graphics, FONT_PATH);
+	menu.initButton();
 	SDL_QueryTexture(pipeTexture, NULL, NULL, &pipes.pipeW, &pipes.pipeH);
 	SDL_QueryTexture(birdTexture, NULL, NULL, &bird.widthBird, &bird.heightBird);
 	aniBird.loadFrame(graphics.renderer);
@@ -40,19 +43,18 @@ int main(int argc, char* agrv[]) {
 			if (event.type == SDL_QUIT)
 				quit = true;
 			else if (event.type == SDL_KEYDOWN && prepareGame) {
-				if (event.key.keysym.sym == SDLK_SPACE) {
-					prepareGame = false;
-					aniBird.reset();
-					resetGame(bird);
-					startGameSetUp(pipes);
-					game = true;
-				}
+				menu.handleEvent(event, game, pipeSpeed, PASS_HOLE, aniBird, pipes, bird, prepareGame);
 			}
 		}
-
+		
+		graphics.prepareSceneNoBg();
 		const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
-		if (!game) {
+		if (prepareGame) {
+			menu.render(graphics);
+		}
+
+		else if (!game) {
 			graphics.prepareSceneNoBg();
 			background.scroll(0);
 			graphics.renderScrollBg(background);

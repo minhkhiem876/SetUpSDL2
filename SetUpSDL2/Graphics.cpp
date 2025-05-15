@@ -1,7 +1,10 @@
-#include "Graphics.h"
+Ôªø#include "Graphics.h"
 #include "Resource.h"
+#include "Logic.h"
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <vector>
+#include <string>
 #include "Objects.h"
 using namespace std;
 void ScrollingBackground::setTexture(SDL_Texture* _texture) {
@@ -69,8 +72,8 @@ void Graphics::renderTexture(SDL_Texture* texture, int x, int y) const {
 	SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
 	SDL_RenderCopy(renderer, texture, NULL, &dest);
 }
-// dest l‡ hÏnh chu nhat m‡ texture duoc ve trÍn renderer
-// texture luÙn duoc lay toan phan 
+// dest l√† h√¨nh chu nhat m√† texture duoc ve tr√™n renderer
+// texture lu√¥n duoc lay toan phan 
 
 void Graphics::renderTextureAngle(SDL_Texture* texture, Bird& bird) {
 	SDL_Rect dest;
@@ -123,4 +126,203 @@ TTF_Font* Graphics::loadFont(const char* path, int size) {
 		return nullptr;
 	}
 	return font;
+}
+
+Slider::Slider(int minV, int maxV, int initV) {
+	minValue = minV;
+	maxValue = maxV;
+	value = initV;
+}
+
+void Slider::increase() {
+	if (value < maxValue) value++;
+}
+
+void Slider::decrease() {
+	if (value < minValue) value--;
+}
+
+float Slider::getPercent() const {
+	return float(value - minValue) / (maxValue - minValue);
+}
+
+Button::Button(const string& label_, SDL_Rect rect_, bool isSelected_) {
+	label = label_;
+	rect = rect_;
+	isSelected = isSelected_;
+}
+
+void Button :: render(Graphics& graphics, TTF_Font* font, TTF_Font* fontSelected, SDL_Color color) const {
+	TTF_Font* usedFont = isSelected ? fontSelected : font;
+	SDL_Texture* textTex = graphics.renderText(label.c_str(), usedFont, color);
+	if (textTex) {
+		int texW, texH;
+		SDL_QueryTexture(textTex, NULL, NULL, &texW, &texH);
+		SDL_Rect renderRect = rect;
+		renderRect.w = texW;
+		renderRect.h = texH;
+
+		SDL_RenderCopy(graphics.renderer, textTex, NULL, &renderRect);
+		SDL_DestroyTexture(textTex);
+	}
+}
+
+void Menu::loadFonts(Graphics& graphics, const char* fontPath) {
+	font = graphics.loadFont(fontPath, 28);
+	selectedFont = graphics.loadFont(fontPath, 36);
+}
+
+void Menu::initButton() {
+	mainButtons.clear();
+	mainButtons.push_back({ "Play", {100, 200, 200, 50}, true });
+	mainButtons.push_back({ "Settings", {100, 280, 200, 50}, false });
+}
+
+void Menu::nextChoice() {
+	if (inSettings) {
+		selectedChoice = (selectedChoice + 1) % 2;
+	}
+	else {
+		mainButtons[selectedChoice].isSelected = false;
+		selectedChoice = (selectedChoice + 1) % mainButtons.size();
+		mainButtons[selectedChoice].isSelected = true;
+	}
+}
+
+void Menu::prevChoice() {
+	if (inSettings) {
+		selectedChoice = (selectedChoice + 1) % 2;
+	}
+	else {
+		mainButtons[selectedChoice].isSelected = false;
+		selectedChoice = (selectedChoice - 1 + mainButtons.size()) % mainButtons.size();
+		mainButtons[selectedChoice].isSelected = true;
+	}
+}
+
+void Menu::drawSlider(Graphics& graphics, const char* label, int value, float percent, int x, int y, bool selected) {
+	TTF_Font* usedFont = selected ? selectedFont : font;
+	SDL_Color textColor = { 255, 255, 255, 255 };
+	SDL_Color shadowColor = { 0, 0, 0, 255 };
+
+	string text = string(label) + ": " + to_string(value);
+
+	SDL_Texture* textTex = graphics.renderText(text.c_str(), usedFont, textColor);
+	SDL_Texture* shadowTex = graphics.renderText(text.c_str(), usedFont, shadowColor);
+	if (shadowTex && textTex) {
+		int texW, texH;
+		SDL_QueryTexture(textTex, NULL, NULL, &texW, &texH);
+
+		SDL_Rect textRect = { x, y, texW, texH };
+		SDL_Rect shadowRect = { x + 2, y + 2, texW, texH };
+
+		SDL_RenderCopy(graphics.renderer, shadowTex, NULL, &shadowRect);
+		SDL_RenderCopy(graphics.renderer, textTex, NULL, &textRect);
+
+		SDL_DestroyTexture(shadowTex);
+		SDL_DestroyTexture(textTex);
+	}
+	const int sliderWidth = 200;
+	const int sliderHeight = 10;
+	const int sliderX = x;
+	const int sliderY = y + 40;
+
+	SDL_Rect sliderBack = { sliderX, sliderY, sliderWidth, sliderHeight };
+	SDL_Rect sliderFill = { sliderX, sliderY, static_cast<int>(sliderWidth * percent), sliderHeight };
+
+	SDL_SetRenderDrawColor(graphics.renderer, 100, 100, 100, 255); //x√°m
+	SDL_RenderFillRect(graphics.renderer, &sliderBack);
+
+	SDL_SetRenderDrawColor(graphics.renderer, 0, 200, 0, 255);//xanh
+	SDL_RenderFillRect(graphics.renderer, &sliderFill);
+
+	SDL_SetRenderDrawColor(graphics.renderer, 255, 255, 255, 255);//tr·∫Øng 
+	SDL_RenderDrawRect(graphics.renderer, &sliderBack);
+}
+
+void Menu::handleEvent(SDL_Event& event, bool& game, int& pipeSpeed, int& PASS_HOLE, AnimationBird aniBird, Pipe& pipes, Bird& bird, bool prepareGame) {
+	if (event.type != SDL_KEYDOWN) return;
+
+	switch (event.key.keysym.sym) {
+	case SDLK_DOWN:
+		nextChoice();
+		break;
+
+	case SDLK_UP:
+		prevChoice();
+		break;
+
+	case SDLK_LEFT:
+		if (inSettings) {
+			if (selectedChoice == 0) pipeSpeedSlider.decrease();
+			else if (selectedChoice == 1) passHoleSlider.decrease();
+		}
+		break;
+
+	case SDLK_RIGHT:
+		if (inSettings) {
+			if (selectedChoice == 0) pipeSpeedSlider.increase();
+			else if (selectedChoice == 1) passHoleSlider.increase();
+		}
+		break;
+
+	case SDLK_RETURN:
+		if (!inSettings) {
+			if (selectedChoice == 0) {
+				pipeSpeed = pipeSpeedSlider.value;
+				PASS_HOLE = passHoleSlider.value;
+				prepareGame = false;
+				game = true;
+				aniBird.reset();
+				resetGame(bird);
+				startGameSetUp(pipes);
+			}
+			else if (selectedChoice == 1) {
+				inSettings = true;
+				selectedChoice = 0;
+			}
+		}
+		else {
+			inSettings = false;
+			selectedChoice = 0;
+			mainButtons[0].isSelected = true;
+			mainButtons[1].isSelected = false;
+		}
+		break;
+	}
+}
+
+void Menu::render(Graphics& graphics) {
+	graphics.prepareSceneNoBg();
+
+	SDL_Color normalColor = { 255, 255, 255, 255 };
+	SDL_Color selectedColor = { 255, 255, 0, 255 };
+	SDL_Color shadowColor = { 0, 0, 0, 255 };
+
+	if (!inSettings) {
+		for (int i = 0; i < mainButtons.size(); ++i) {
+			Button& btn = mainButtons[i];
+
+			SDL_Texture* shadow = graphics.renderText(
+				btn.label.c_str(), font, shadowColor);
+			graphics.renderTexture(shadow, btn.rect.x + 2, btn.rect.y + 2);
+			SDL_DestroyTexture(shadow);
+
+			SDL_Texture* text = graphics.renderText(btn.label.c_str(), btn.isSelected ? selectedFont : font, btn.isSelected ? selectedColor : normalColor);
+
+			if (btn.isSelected) {
+				graphics.renderTexture(text, btn.rect.x - 10, btn.rect.y - 5);
+			}
+			else {
+				graphics.renderTexture(text, btn.rect.x, btn.rect.y);
+			}
+
+			SDL_DestroyTexture(text);
+		}
+	}
+	else {
+		drawSlider(graphics, "Pipe Speed", pipeSpeedSlider.value, pipeSpeedSlider.getPercent(), 100, 150, selectedChoice == 0);
+		drawSlider(graphics, "Pass Hole", passHoleSlider.value, passHoleSlider.getPercent(), 100, 230, selectedChoice == 1);
+
+	}
 }

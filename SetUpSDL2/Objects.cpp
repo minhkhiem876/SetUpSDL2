@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstdlib>
 #include <string>
-
+using namespace std;
 
 Bird::Bird() {
 	birdAngle = 0.0f;

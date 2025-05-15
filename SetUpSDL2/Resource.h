@@ -3,11 +3,11 @@
 
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
-extern const int pipeSpeed;
+extern int pipeSpeed;
 extern const int distanceScroll;
 extern const int PIPE_DISTANCE;
 extern const int FLY_SPEED;
-extern const int PASS_HOLE;
+extern int PASS_HOLE;
 
 extern const char* FONT_PATH;
 extern const char* WINDOW_TITLE;
