@@ -10,7 +10,7 @@ using namespace std;
 
 struct Bird {
 	const float MAX_ANGLE = 90.0f;
-	const float MIN_ANGLE = - 25.0f;
+	const float MIN_ANGLE = 25.0f;
 	const float ANGLE_FALL_SPEED = 2.0f;
 	const int MAX_DROP_SPEED = 10;
 
@@ -30,13 +30,23 @@ struct Pipe {
 
 struct AnimationBird {
 	static const int BIRD_FLY_FRAME_COUNT = 8;
+	static const int BIRD_DEAD_FRAME_COUNT = 12;
 	static const int FRAME_DELAY = 100;
+	static const int FRAME_DEAD_DELAY = 30;
+	
 	SDL_Texture* birdFrames[BIRD_FLY_FRAME_COUNT];
+	SDL_Texture* birdDeadFrames[BIRD_DEAD_FRAME_COUNT];
+
 	int currentFrame;;
 	Uint32 lastFrameTime;
+
+	int currentDeadFrame;
+	Uint32 lastDeadFrameTime;
 	
 	AnimationBird();
 	void loadFrame(SDL_Renderer* renderer);
+	void updateDeadAnimation(Bird& bird);
 	void updateBirdAnimation();
+	void reset();
 };
 #endif

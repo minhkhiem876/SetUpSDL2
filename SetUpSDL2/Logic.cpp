@@ -1,13 +1,17 @@
 ﻿#include "Logic.h"
-#include <iostream>
-#include <SDL.h>
-#include <vector>
+#include "Graphics.h"
 #include "Resource.h"
+#include <SDL.h>
+#include <SDL_ttf.h>
+#include <iostream>
+#include <vector>
+#include <string>
 using namespace std;
+
 
 void birdFly(const Uint8* currentKeyStated, Bird& bird) {
 	if (currentKeyStated[SDL_SCANCODE_SPACE]) {
-		bird.vel = - FALL_SPEED;
+		bird.vel = -FLY_SPEED;
 		bird.birdAngle = bird.MIN_ANGLE;
 	}
 
@@ -18,7 +22,7 @@ void birdFly(const Uint8* currentKeyStated, Bird& bird) {
 	bird.birdPosY += bird.vel;
 
 	if (bird.vel >= 0) {
-		bird.birdAngle += bird.ANGLE_FALL_SPEED;
+		bird.birdAngle -= bird.ANGLE_FALL_SPEED;
 		if (bird.birdAngle > bird.MAX_ANGLE) {
 			bird.birdAngle = bird.MAX_ANGLE;
 		}
@@ -28,7 +32,7 @@ void birdFly(const Uint8* currentKeyStated, Bird& bird) {
 	}
 }
 
-void pipeRunning(Pipe& pipes, Graphics& graphics, SDL_Texture* pipe, const int pipeSpeed, bool gen) {
+void pipeRunning(Pipe& pipes, Graphics& graphics, SDL_Texture* pipe, const int pipeSpeed) {
 	for (int i = 0; i < 4; i++) {
 		pipes.pos_pipes[i][0] -= pipeSpeed;
 		graphics.advancedRenderTexture(pipe, pipes.pos_pipes[i][0], pipes.pos_pipes[i][2], SDL_FLIP_VERTICAL);
@@ -44,17 +48,16 @@ void pipeRunning(Pipe& pipes, Graphics& graphics, SDL_Texture* pipe, const int p
 
 	pipes.scoreMeter -= pipeSpeed;
 
-	if (gen) {
-		if (pipes.pos_pipes[0][0] + pipes.pipeW < 0) {
-			for (int i = 0; i < 3; i++) {
-				pipes.pos_pipes[i] = pipes.pos_pipes[i + 1];
-			}
-			pipes.randomPositionGenerator();
-			pipes.pos_pipes[3][0] = pipes.pos_pipes[2][0] + pipes.pipeW + pipes.pipeDistance;
-			pipes.pos_pipes[3][1] = pipes.pipe1Y;
-			pipes.pos_pipes[3][2] = pipes.pipe2Y;
+	if (pipes.pos_pipes[0][0] + pipes.pipeW < 0) {
+		for (int i = 0; i < 3; i++) {
+			pipes.pos_pipes[i] = pipes.pos_pipes[i + 1];
 		}
+		pipes.randomPositionGenerator();
+		pipes.pos_pipes[3][0] = pipes.pos_pipes[2][0] + pipes.pipeW + pipes.pipeDistance;
+		pipes.pos_pipes[3][1] = pipes.pipe1Y;
+		pipes.pos_pipes[3][2] = pipes.pipe2Y;
 	}
+	
 }
 
 void startGameSetUp(Pipe& pipes) {
@@ -108,4 +111,11 @@ void checkCollision(Pipe& pipes, Bird& bird, bool& game) {
 		game = false;
 		return;
 	}
+}
+
+void renderScore(Graphics& graphics, int score, string line, TTF_Font* font, SDL_Color color, int x, int y) {
+	string scored = line + to_string(score);
+	SDL_Texture* scoreText = graphics.renderText(scored.c_str(), font, color);
+	graphics.renderTexture(scoreText, x, y);
+	SDL_DestroyTexture(scoreText);
 }

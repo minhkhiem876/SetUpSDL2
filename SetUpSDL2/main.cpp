@@ -1,17 +1,22 @@
 ﻿#include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 #include "Resource.h"
 #include "Graphics.h"
 #include "Objects.h"
 #include "Logic.h"
+#include <algorithm>
 #include <ctime>
 using namespace std;
 
 int main(int argc, char* agrv[]) {
 	Graphics graphics;
 	graphics.init();
-	SDL_Color color = { 255, 255, 0, 0 };
+	SDL_Color colorScore = { 0, 200, 0, 255 };
+	SDL_Color colorHighestScore = { 255, 50, 50, 255 };
+	int fontSize = 20;
+	TTF_Font* font = graphics.loadFont(FONT_PATH, fontSize);
 
 	ScrollingBackground background;
 	background.setTexture(graphics.loadTexture(SKY_BACKGROUND_PATH));
@@ -27,7 +32,7 @@ int main(int argc, char* agrv[]) {
 
 	srand(time(NULL));
 	bool quit = false, prepareGame = true, firstPlay = true, game = false;
-	int highScore = 0, timer = 0;
+	int highestScore = 0, timer = 0;
 
 	SDL_Event event;
 	while (!quit) {
@@ -37,6 +42,7 @@ int main(int argc, char* agrv[]) {
 			else if (event.type == SDL_KEYDOWN && prepareGame) {
 				if (event.key.keysym.sym == SDLK_SPACE) {
 					prepareGame = false;
+					aniBird.reset();
 					resetGame(bird);
 					startGameSetUp(pipes);
 					game = true;
@@ -47,18 +53,20 @@ int main(int argc, char* agrv[]) {
 		const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
 		if (!game) {
+			graphics.prepareSceneNoBg();
 			background.scroll(0);
+			graphics.renderScrollBg(background);
 
 			if (firstPlay) {
-				graphics.prepareSceneNoBg();
-				graphics.renderScrollBg(background);
 				aniBird.updateBirdAnimation();
 				graphics.renderTextureAngle(aniBird.birdFrames[aniBird.currentFrame], bird);
 			}
 			else {
-				pipeRunning(pipes, graphics, pipeTexture, 0, false);
+				pipeRunning(pipes, graphics, pipeTexture, 0);
+				aniBird.updateDeadAnimation(bird);
+				graphics.renderTexture(aniBird.birdDeadFrames[aniBird.currentDeadFrame], bird.birdPosX, bird.birdPosY);
 				timer += 10;
-				if (timer == 200) {
+				if (timer == 500) {
 					prepareGame = true;
 					timer = 0;
 				}
@@ -66,20 +74,22 @@ int main(int argc, char* agrv[]) {
 		}
 
 		else {
-			graphics.prepareSceneNoBg();
 			firstPlay = false;
 
 			background.scroll(1);
 			graphics.renderScrollBg(background);
 
-			pipeRunning(pipes, graphics, pipeTexture, pipeSpeed, true);
+			pipeRunning(pipes, graphics, pipeTexture, pipeSpeed);
 			birdFly(currentKeyStates, bird);
 			aniBird.updateBirdAnimation();
 			graphics.renderTextureAngle(aniBird.birdFrames[aniBird.currentFrame], bird);
 			checkCollision(pipes, bird, game);
 		}
+		highestScore = max(highestScore, bird.score);
+		renderScore(graphics, bird.score, "Score: ", font, colorScore, 0, 0);
+		renderScore(graphics, highestScore, "HighestScore: ", font, colorHighestScore, 0, 30);
 		graphics.presentScene();
-	}
+	} 
 
 	graphics.quit();
 	return 0;

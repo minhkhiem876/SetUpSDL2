@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <string>
 
-using namespace std;
 
 Bird::Bird() {
 	birdAngle = 0.0f;
@@ -24,7 +23,7 @@ Pipe::Pipe() {
 	pipeH = 0;
 	pipeDistance = PIPE_DISTANCE;
 	scoreMeter = 0;
-	passHole = 150;
+	passHole = PASS_HOLE;
 	pos_pipes = vector<vector<int>>(rows, vector<int>(cols));
 }
 
@@ -36,6 +35,9 @@ void Pipe::randomPositionGenerator() {
 AnimationBird :: AnimationBird() {
 	currentFrame = 0;
 	lastFrameTime = 0;
+
+	currentDeadFrame = 0;
+	lastDeadFrameTime = 0; 
 }
 
 void AnimationBird::loadFrame (SDL_Renderer* renderer){
@@ -47,14 +49,36 @@ void AnimationBird::loadFrame (SDL_Renderer* renderer){
 			return;
 		}
 	}
+	for (int i = 0; i < BIRD_DEAD_FRAME_COUNT; i++) {
+		string path = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/animationDead/Dead_" + to_string(i) + ".png";
+		birdDeadFrames[i] = IMG_LoadTexture(renderer, path.c_str());
+		if (!birdDeadFrames[i]) {
+			SDL_Log("Failed to lead bird frame: %s", SDL_GetError());
+			return;
+		}
+	}
 }
 
 void AnimationBird :: updateBirdAnimation() {
-	Uint32 currentTime = SDL_GetTicks();
-	if (currentTime > lastFrameTime + FRAME_DELAY) {
+	Uint32 currentFrameTime = SDL_GetTicks();
+	if (currentFrameTime > lastFrameTime + FRAME_DELAY) {
 		currentFrame = (currentFrame + 1) % BIRD_FLY_FRAME_COUNT;
-		lastFrameTime = currentTime;
+		lastFrameTime = currentFrameTime;
 	}
+}
+
+void AnimationBird::updateDeadAnimation(Bird& bird) {
+	Uint32 currentDeadFrameTime = SDL_GetTicks();
+	if (currentDeadFrameTime > lastDeadFrameTime + FRAME_DEAD_DELAY && currentDeadFrame < BIRD_DEAD_FRAME_COUNT - 1) {
+		currentDeadFrame = currentDeadFrame++;
+		lastDeadFrameTime = currentDeadFrameTime;
+		bird.birdPosY += 10;
+	}
+}
+
+void AnimationBird::reset() {
+	currentDeadFrame = 0;
+	lastDeadFrameTime = 0;
 }
 
 

@@ -2,6 +2,7 @@
 #define GRAPHICS_H
 
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include "Objects.h"
 #include <SDL_image.h>
 #include <vector>
@@ -31,7 +32,7 @@ struct Graphics {
 
 	SDL_Texture* loadTexture(const char* filename) const;
 
-	void renderTexture(SDL_Texture* texture, int x, int y) const;
+	void renderTexture(SDL_Texture* texture, int x, int y) const; 
 
 	void renderTextureAngle(SDL_Texture* texture, Bird& bird);
 
@@ -41,6 +42,9 @@ struct Graphics {
 
 	void quit() const;
 
+	SDL_Texture* renderText(const char* text, TTF_Font* font, SDL_Color textColor);
+
+	TTF_Font* loadFont(const char* path, int size);
 };
 
 #endif

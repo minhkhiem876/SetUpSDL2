@@ -1,6 +1,7 @@
 #include "Graphics.h"
 #include "Resource.h"
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include "Objects.h"
 using namespace std;
 void ScrollingBackground::setTexture(SDL_Texture* _texture) {
@@ -33,6 +34,9 @@ void Graphics::init() {
 		SDL_Log("CreateRenderer ERROR: %s", SDL_GetError());
 	}
 
+	if (TTF_Init() == -1) {
+		SDL_Log("TTF_Init failed: %s", TTF_GetError());
+	}
 	SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
@@ -74,7 +78,7 @@ void Graphics::renderTextureAngle(SDL_Texture* texture, Bird& bird) {
 	dest.y = bird.birdPosY;
 	SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
 	SDL_Point center = { dest.w / 2, dest.h / 2 };
-	SDL_RenderCopyEx(renderer, texture, nullptr, &dest, bird.birdAngle, &center, SDL_FLIP_NONE);
+	SDL_RenderCopyEx(renderer, texture, nullptr, &dest, -bird.birdAngle, &center, SDL_FLIP_NONE);
 }
 
 void Graphics::advancedRenderTexture(SDL_Texture* texture, int x, int y, SDL_RendererFlip flipType) const {
@@ -96,4 +100,27 @@ void Graphics::quit() const {
 	SDL_DestroyWindow(window);
 	IMG_Quit();
 	SDL_Quit();
+}
+
+SDL_Texture* Graphics::renderText(const char* text, TTF_Font* font, SDL_Color textColor) {
+	SDL_Surface* textSurface = TTF_RenderText_Solid(font, text, textColor);
+	if (textSurface == nullptr) {
+		SDL_Log("TTF_Error: %s", TTF_GetError());
+		return nullptr;
+	}
+	SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+	if (textTexture == nullptr) {
+		SDL_Log("TTF_Error: %s", TTF_GetError());
+		return nullptr;
+	}
+	return textTexture;
+}
+
+TTF_Font* Graphics::loadFont(const char* path, int size) {
+	TTF_Font* font = TTF_OpenFont(path, size);
+	if (font == nullptr) {
+		SDL_Log("TTF_Error: %s", SDL_GetError());
+		return nullptr;
+	}
+	return font;
 }
