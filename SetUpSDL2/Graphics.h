@@ -86,7 +86,7 @@ struct Menu {
 	void prevChoice();
 
 	void drawSlider(Graphics& graphics, const char* label, int value, float percent, int x, int y, bool selected);
-	void handleEvent(SDL_Event& event, bool& game, int& pipeSpeed, int& PASS_HOLE, AnimationBird aniBird, Pipe& pipes, Bird& bird, bool prepareGame);
+	void handleEvent(SDL_Event& event, bool& game, int& pipeSpeed, AnimationBird aniBird, Pipe& pipes, Bird& bird, bool& prepareGame);
 	void render(Graphics& graphics);
 };
 

@@ -79,9 +79,10 @@ void resetGame(Bird& bird) {
 	bird.birdPosY = SCREEN_HEIGHT /3;
 	bird.vel = 0;
 	bird.score = 0;
+	bird.birdAngle = 0;
 }
 
-void checkCollision(Pipe& pipes, Bird& bird, bool& game) {
+void checkCollision(Pipe& pipes, Bird& bird, bool& prepareGame) {
 	int boundingPosX1 = bird.birdPosX, boundingPosY1 = bird.birdPosY;
 	int boundingPosX2 = boundingPosX1 + bird.widthBird, boundingPosY2 = boundingPosY1 + bird.heightBird;
 
@@ -97,18 +98,18 @@ void checkCollision(Pipe& pipes, Bird& bird, bool& game) {
 		SDL_Rect pipe2Rect = { pipes.pos_pipes[i][0], pipes.pos_pipes[i][2], pipes.pipeW, pipes.pipeH };
 	
 		if (SDL_HasIntersection(&birdRect, &pipe1Rect) || SDL_HasIntersection(&birdRect, &pipe2Rect)) {
-			game = false;
+			prepareGame = true;
 			return;
 		}
 	}
 
 	if (boundingPosY1 < 0) {
-		game = false;
+		prepareGame = true;
 		return;
 	}
 
 	if (boundingPosY2 > SCREEN_HEIGHT) {
-		game = false;
+		prepareGame = true;
 		return;
 	}
 }

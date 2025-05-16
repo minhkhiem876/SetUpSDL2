@@ -7,7 +7,7 @@ extern int pipeSpeed;
 extern const int distanceScroll;
 extern const int PIPE_DISTANCE;
 extern const int FLY_SPEED;
-extern int PASS_HOLE;
+extern const int PASS_HOLE;
 
 extern const char* FONT_PATH;
 extern const char* WINDOW_TITLE;

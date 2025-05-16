@@ -43,49 +43,54 @@ int main(int argc, char* agrv[]) {
 			if (event.type == SDL_QUIT)
 				quit = true;
 			else if (event.type == SDL_KEYDOWN && prepareGame) {
-				menu.handleEvent(event, game, pipeSpeed, PASS_HOLE, aniBird, pipes, bird, prepareGame);
+				menu.handleEvent(event, game, pipeSpeed, aniBird, pipes, bird, prepareGame);
 			}
 		}
 		
 		graphics.prepareSceneNoBg();
 		const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
-		if (prepareGame) {
+		if (prepareGame && !game) {
 			menu.render(graphics);
+			aniBird.reset();
+			startGameSetUp(pipes);
+			resetGame(bird);
 		}
 
-		else if (!game) {
-			graphics.prepareSceneNoBg();
+		else if (!prepareGame && !game) {
 			background.scroll(0);
 			graphics.renderScrollBg(background);
-
-			if (firstPlay) {
+			aniBird.updateBirdAnimation();
+			graphics.renderTextureAngle(aniBird.birdFrames[aniBird.currentFrame], bird);
+			if (currentKeyStates[SDL_SCANCODE_SPACE]) {
+				pipeRunning(pipes, graphics, pipeTexture, pipeSpeed);
+				birdFly(currentKeyStates, bird);
 				aniBird.updateBirdAnimation();
 				graphics.renderTextureAngle(aniBird.birdFrames[aniBird.currentFrame], bird);
-			}
-			else {
-				pipeRunning(pipes, graphics, pipeTexture, 0);
-				aniBird.updateDeadAnimation(bird);
-				graphics.renderTexture(aniBird.birdDeadFrames[aniBird.currentDeadFrame], bird.birdPosX, bird.birdPosY);
-				timer += 10;
-				if (timer == 500) {
-					prepareGame = true;
-					timer = 0;
-				}
+				game = true;
 			}
 		}
 
-		else {
-			firstPlay = false;
-
+		else if (!prepareGame && game) {
 			background.scroll(1);
 			graphics.renderScrollBg(background);
-
 			pipeRunning(pipes, graphics, pipeTexture, pipeSpeed);
 			birdFly(currentKeyStates, bird);
 			aniBird.updateBirdAnimation();
 			graphics.renderTextureAngle(aniBird.birdFrames[aniBird.currentFrame], bird);
-			checkCollision(pipes, bird, game);
+			checkCollision(pipes, bird, prepareGame);
+		}
+		else {
+			background.scroll(0);
+			graphics.renderScrollBg(background);
+			pipeRunning(pipes, graphics, pipeTexture, 0);
+			aniBird.updateDeadAnimation(bird);
+			graphics.renderTextureAngle(aniBird.birdDeadFrames[aniBird.currentDeadFrame], bird);
+			timer += 10;
+			if (timer >= 500) {
+				game = false;
+				timer = 0;
+			}
 		}
 		highestScore = max(highestScore, bird.score);
 		renderScore(graphics, bird.score, "Score: ", font, colorScore, 0, 0);
@@ -93,6 +98,6 @@ int main(int argc, char* agrv[]) {
 		graphics.presentScene();
 	} 
 
-	graphics.quit();
+	graphics.quit(); 
 	return 0;
 }

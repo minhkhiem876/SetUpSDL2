@@ -14,7 +14,7 @@ void startGameSetUp(Pipe& pipes);
 
 void resetGame(Bird& bird);
 
-void checkCollision(Pipe& pipes, Bird& bird, bool& game);
+void checkCollision(Pipe& pipes, Bird& bird, bool& prepareGame);
 
 void renderScore(Graphics& graphics, int score, string line, TTF_Font* font, SDL_Color color, int x, int y);
 

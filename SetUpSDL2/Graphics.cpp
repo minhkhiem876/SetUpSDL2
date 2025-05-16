@@ -139,7 +139,7 @@ void Slider::increase() {
 }
 
 void Slider::decrease() {
-	if (value < minValue) value--;
+	if (value > minValue) value--;
 }
 
 float Slider::getPercent() const {
@@ -203,29 +203,24 @@ void Menu::prevChoice() {
 void Menu::drawSlider(Graphics& graphics, const char* label, int value, float percent, int x, int y, bool selected) {
 	TTF_Font* usedFont = selected ? selectedFont : font;
 	SDL_Color textColor = { 255, 255, 255, 255 };
-	SDL_Color shadowColor = { 0, 0, 0, 255 };
-
+	SDL_Color textSelectedColor = { 255, 255, 0, 255 };
 	string text = string(label) + ": " + to_string(value);
 
-	SDL_Texture* textTex = graphics.renderText(text.c_str(), usedFont, textColor);
-	SDL_Texture* shadowTex = graphics.renderText(text.c_str(), usedFont, shadowColor);
-	if (shadowTex && textTex) {
+	SDL_Texture* textTex = graphics.renderText(text.c_str(), usedFont, selected ? textSelectedColor : textColor);
+	if (textTex) {
 		int texW, texH;
 		SDL_QueryTexture(textTex, NULL, NULL, &texW, &texH);
 
 		SDL_Rect textRect = { x, y, texW, texH };
-		SDL_Rect shadowRect = { x + 2, y + 2, texW, texH };
 
-		SDL_RenderCopy(graphics.renderer, shadowTex, NULL, &shadowRect);
 		SDL_RenderCopy(graphics.renderer, textTex, NULL, &textRect);
 
-		SDL_DestroyTexture(shadowTex);
 		SDL_DestroyTexture(textTex);
 	}
 	const int sliderWidth = 200;
 	const int sliderHeight = 10;
-	const int sliderX = x;
-	const int sliderY = y + 40;
+	const int sliderX = x + 300;
+	const int sliderY = y + 25;
 
 	SDL_Rect sliderBack = { sliderX, sliderY, sliderWidth, sliderHeight };
 	SDL_Rect sliderFill = { sliderX, sliderY, static_cast<int>(sliderWidth * percent), sliderHeight };
@@ -240,7 +235,7 @@ void Menu::drawSlider(Graphics& graphics, const char* label, int value, float pe
 	SDL_RenderDrawRect(graphics.renderer, &sliderBack);
 }
 
-void Menu::handleEvent(SDL_Event& event, bool& game, int& pipeSpeed, int& PASS_HOLE, AnimationBird aniBird, Pipe& pipes, Bird& bird, bool prepareGame) {
+void Menu::handleEvent(SDL_Event& event, bool& game, int& pipeSpeed, AnimationBird aniBird, Pipe& pipes, Bird& bird, bool& prepareGame) {
 	if (event.type != SDL_KEYDOWN) return;
 
 	switch (event.key.keysym.sym) {
@@ -270,9 +265,8 @@ void Menu::handleEvent(SDL_Event& event, bool& game, int& pipeSpeed, int& PASS_H
 		if (!inSettings) {
 			if (selectedChoice == 0) {
 				pipeSpeed = pipeSpeedSlider.value;
-				PASS_HOLE = passHoleSlider.value;
+				pipes.passHole = passHoleSlider.value;
 				prepareGame = false;
-				game = true;
 				aniBird.reset();
 				resetGame(bird);
 				startGameSetUp(pipes);
@@ -323,6 +317,5 @@ void Menu::render(Graphics& graphics) {
 	else {
 		drawSlider(graphics, "Pipe Speed", pipeSpeedSlider.value, pipeSpeedSlider.getPercent(), 100, 150, selectedChoice == 0);
 		drawSlider(graphics, "Pass Hole", passHoleSlider.value, passHoleSlider.getPercent(), 100, 230, selectedChoice == 1);
-
 	}
 }

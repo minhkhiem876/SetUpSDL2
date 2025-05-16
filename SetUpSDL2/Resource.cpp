@@ -7,7 +7,7 @@ int pipeSpeed = 3;
 const int distanceScroll = 2;
 const int PIPE_DISTANCE = 300;
 const int FLY_SPEED = 10;
-int PASS_HOLE = 200;
+const int PASS_HOLE = 200;
 
 const char* FONT_PATH = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/Font.ttf";
 const char* WINDOW_TITLE = "Flappy Bird";
