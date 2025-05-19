@@ -8,7 +8,10 @@ const int distanceScroll = 2;
 const int PIPE_DISTANCE = 300;
 const int FLY_SPEED = 10;
 const int PASS_HOLE = 200;
+const int ITEM_DROP_CHANCE = 30;
 
+const char* MUSIC_PATH = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/Music.mp3";
+const char* ITEM_PATH = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/Item.png";
 const char* FONT_PATH = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/Font.ttf";
 const char* WINDOW_TITLE = "Flappy Bird";
 const char* SKY_BACKGROUND_PATH = "C:/Users/khiem/Desktop/SetUpSDL2/SetUpSDL2/background.png";

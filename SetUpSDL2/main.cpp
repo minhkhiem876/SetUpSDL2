@@ -18,10 +18,19 @@ int main(int argc, char* agrv[]) {
 	int fontSize = 20;
 	TTF_Font* font = graphics.loadFont(FONT_PATH, fontSize);
 
+	graphics.loadMusic(MUSIC_PATH);
+	graphics.playMusic();
+
 	ScrollingBackground background;
 	background.setTexture(graphics.loadTexture(SKY_BACKGROUND_PATH));
 	SDL_Texture* birdTexture = graphics.loadTexture(BIRD_PATH);
 	SDL_Texture* pipeTexture = graphics.loadTexture(PIPE_PATH);
+	SDL_Texture* itemTexture = graphics.loadTexture(ITEM_PATH);
+
+	vector<Item> items(3);
+	for (int i = 0; i < 3; i++) {
+		SDL_QueryTexture(itemTexture, NULL, NULL, &items[i].width, &items[i].height);
+	}
 
 	AnimationBird aniBird;
 	Bird bird;
@@ -36,6 +45,7 @@ int main(int argc, char* agrv[]) {
 	srand(time(NULL));
 	bool quit = false, prepareGame = true, firstPlay = true, game = false;
 	int highestScore = 0, timer = 0;
+	int lastScoreCheck = 0;
 
 	SDL_Event event;
 	while (!quit) {
@@ -43,7 +53,7 @@ int main(int argc, char* agrv[]) {
 			if (event.type == SDL_QUIT)
 				quit = true;
 			else if (event.type == SDL_KEYDOWN && prepareGame) {
-				menu.handleEvent(event, game, pipeSpeed, aniBird, pipes, bird, prepareGame);
+				menu.handleEvent(event, game, pipeSpeed, aniBird, pipes, bird, prepareGame, items, lastScoreCheck);
 			}
 		}
 		
@@ -53,8 +63,8 @@ int main(int argc, char* agrv[]) {
 		if (prepareGame && !game) {
 			menu.render(graphics);
 			aniBird.reset();
-			startGameSetUp(pipes);
-			resetGame(bird);
+			startGameSetUp(pipes, items);
+			resetGame(bird, lastScoreCheck);
 		}
 
 		else if (!prepareGame && !game) {
@@ -63,7 +73,7 @@ int main(int argc, char* agrv[]) {
 			aniBird.updateBirdAnimation();
 			graphics.renderTextureAngle(aniBird.birdFrames[aniBird.currentFrame], bird);
 			if (currentKeyStates[SDL_SCANCODE_SPACE]) {
-				pipeRunning(pipes, graphics, pipeTexture, pipeSpeed);
+				pipeRunning(pipes, graphics, pipeTexture, pipeSpeed, items);
 				birdFly(currentKeyStates, bird);
 				aniBird.updateBirdAnimation();
 				graphics.renderTextureAngle(aniBird.birdFrames[aniBird.currentFrame], bird);
@@ -74,16 +84,20 @@ int main(int argc, char* agrv[]) {
 		else if (!prepareGame && game) {
 			background.scroll(1);
 			graphics.renderScrollBg(background);
-			pipeRunning(pipes, graphics, pipeTexture, pipeSpeed);
+			pipeRunning(pipes, graphics, pipeTexture, pipeSpeed, items);
 			birdFly(currentKeyStates, bird);
 			aniBird.updateBirdAnimation();
 			graphics.renderTextureAngle(aniBird.birdFrames[aniBird.currentFrame], bird);
-			checkCollision(pipes, bird, prepareGame);
+			checkCollision(pipes, bird, prepareGame, items);
+			if (bird.score > lastScoreCheck && bird.score % 10 == 0) {
+				pipeSpeed++;
+				lastScoreCheck = bird.score;
+			}
 		}
 		else {
 			background.scroll(0);
 			graphics.renderScrollBg(background);
-			pipeRunning(pipes, graphics, pipeTexture, 0);
+			pipeRunning(pipes, graphics, pipeTexture, 0, items);
 			aniBird.updateDeadAnimation(bird);
 			graphics.renderTextureAngle(aniBird.birdDeadFrames[aniBird.currentDeadFrame], bird);
 			timer += 10;

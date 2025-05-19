@@ -49,4 +49,15 @@ struct AnimationBird {
 	void updateBirdAnimation();
 	void reset();
 };
+
+struct Item {
+	Item();
+	int posX;
+	int posY;
+	int width;
+	int height;
+	bool isActive;
+	void reset(int x, int y);
+	int associatedPipeIndex;
+};
 #endif

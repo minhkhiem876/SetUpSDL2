@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include "Objects.h"
+#include <SDL_mixer.h>
 using namespace std;
 void ScrollingBackground::setTexture(SDL_Texture* _texture) {
 	texture = _texture;
@@ -40,6 +41,11 @@ void Graphics::init() {
 	if (TTF_Init() == -1) {
 		SDL_Log("TTF_Init failed: %s", TTF_GetError());
 	}
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+		SDL_Log("SDL_mixer init failed: %s", Mix_GetError());
+	}
+
 	SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
@@ -99,6 +105,11 @@ void Graphics::renderScrollBg(const ScrollingBackground& bgr) const {
 }
 
 void Graphics::quit() const {
+	if (backgroundMusic) {
+		Mix_FreeMusic(backgroundMusic);
+	}
+	Mix_CloseAudio();
+
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	IMG_Quit();
@@ -126,6 +137,23 @@ TTF_Font* Graphics::loadFont(const char* path, int size) {
 		return nullptr;
 	}
 	return font;
+}
+
+void Graphics::loadMusic(const char* path) {
+	backgroundMusic = Mix_LoadMUS(MUSIC_PATH);
+	if (!backgroundMusic) {
+		SDL_Log("Failed to load music: %s", Mix_GetError());
+	}
+}
+
+void Graphics::playMusic() {
+	if (backgroundMusic) {
+		Mix_PlayMusic(backgroundMusic, -1);
+	}
+}
+
+void Graphics::stopMusic() {
+	Mix_HaltMusic();
 }
 
 Slider::Slider(int minV, int maxV, int initV) {
@@ -235,7 +263,7 @@ void Menu::drawSlider(Graphics& graphics, const char* label, int value, float pe
 	SDL_RenderDrawRect(graphics.renderer, &sliderBack);
 }
 
-void Menu::handleEvent(SDL_Event& event, bool& game, int& pipeSpeed, AnimationBird aniBird, Pipe& pipes, Bird& bird, bool& prepareGame) {
+void Menu::handleEvent(SDL_Event& event, bool& game, int& pipeSpeed, AnimationBird aniBird, Pipe& pipes, Bird& bird, bool& prepareGame, vector<Item>& items, int& lastScoreCheck) {
 	if (event.type != SDL_KEYDOWN) return;
 
 	switch (event.key.keysym.sym) {
@@ -268,8 +296,8 @@ void Menu::handleEvent(SDL_Event& event, bool& game, int& pipeSpeed, AnimationBi
 				pipes.passHole = passHoleSlider.value;
 				prepareGame = false;
 				aniBird.reset();
-				resetGame(bird);
-				startGameSetUp(pipes);
+				resetGame(bird, lastScoreCheck);
+				startGameSetUp(pipes, items);
 			}
 			else if (selectedChoice == 1) {
 				inSettings = true;

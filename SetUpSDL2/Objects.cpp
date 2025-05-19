@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <string>
 using namespace std;
-
 Bird::Bird() {
 	birdAngle = 0.0f;
 	widthBird = 0;
@@ -70,7 +69,7 @@ void AnimationBird :: updateBirdAnimation() {
 void AnimationBird::updateDeadAnimation(Bird& bird) {
 	Uint32 currentDeadFrameTime = SDL_GetTicks();
 	if (currentDeadFrameTime > lastDeadFrameTime + FRAME_DEAD_DELAY && currentDeadFrame < BIRD_DEAD_FRAME_COUNT - 1) {
-		currentDeadFrame = currentDeadFrame++;
+		currentDeadFrame++;
 		lastDeadFrameTime = currentDeadFrameTime;
 		bird.birdPosY += 10;
 	}
@@ -79,6 +78,21 @@ void AnimationBird::updateDeadAnimation(Bird& bird) {
 void AnimationBird::reset() {
 	currentDeadFrame = 0;
 	lastDeadFrameTime = 0;
+}
+
+Item::Item() {
+	posX = 0;
+	posY = 0;
+	width = 24;
+	height = 20;
+	isActive = true;
+	associatedPipeIndex = -1;
+}
+
+void Item::reset(int x, int y) {
+	posX = 0;
+	posY = 0;
+	isActive = true;
 }
 
 

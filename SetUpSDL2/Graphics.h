@@ -6,6 +6,7 @@
 #include "Objects.h"
 #include <SDL_image.h>
 #include <vector>
+#include <SDL_mixer.h>
 using namespace std;
 
 struct ScrollingBackground {
@@ -21,6 +22,7 @@ struct ScrollingBackground {
 struct Graphics {
 	SDL_Renderer* renderer;
 	SDL_Window* window;
+	Mix_Music* backgroundMusic;
 
 	void init();
 
@@ -45,6 +47,10 @@ struct Graphics {
 	SDL_Texture* renderText(const char* text, TTF_Font* font, SDL_Color textColor);
 
 	TTF_Font* loadFont(const char* path, int size);
+
+	void loadMusic(const char* path); 
+	void playMusic(); 
+	void stopMusic();
 };
 
 struct Slider {
@@ -77,16 +83,16 @@ struct Menu {
 	TTF_Font* selectedFont = nullptr;
 
 	vector<Button> mainButtons;
-	Slider pipeSpeedSlider = Slider(3, 13, 8);
+	Slider pipeSpeedSlider = Slider(1, 10, 4);
 	Slider passHoleSlider = Slider(150, 400, 200);
-
+	
 	void loadFonts(Graphics& graphics, const char* fontPath);
 	void initButton();
 	void nextChoice();
 	void prevChoice();
 
 	void drawSlider(Graphics& graphics, const char* label, int value, float percent, int x, int y, bool selected);
-	void handleEvent(SDL_Event& event, bool& game, int& pipeSpeed, AnimationBird aniBird, Pipe& pipes, Bird& bird, bool& prepareGame);
+	void handleEvent(SDL_Event& event, bool& game, int& pipeSpeed, AnimationBird aniBird, Pipe& pipes, Bird& bird, bool& prepareGame, vector<Item>& items, int& lastScoreCheck);
 	void render(Graphics& graphics);
 };
 

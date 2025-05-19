@@ -8,7 +8,10 @@ extern const int distanceScroll;
 extern const int PIPE_DISTANCE;
 extern const int FLY_SPEED;
 extern const int PASS_HOLE;
+extern const int ITEM_DROP_CHANCE;
 
+extern const char* MUSIC_PATH;
+extern const char* ITEM_PATH;
 extern const char* FONT_PATH;
 extern const char* WINDOW_TITLE;
 extern const char* SKY_BACKGROUND_PATH;

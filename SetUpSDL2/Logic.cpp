@@ -32,7 +32,7 @@ void birdFly(const Uint8* currentKeyStated, Bird& bird) {
 	}
 }
 
-void pipeRunning(Pipe& pipes, Graphics& graphics, SDL_Texture* pipe, const int pipeSpeed) {
+void pipeRunning(Pipe& pipes, Graphics& graphics, SDL_Texture* pipe, const int pipeSpeed, vector<Item>& items) {
 	for (int i = 0; i < 4; i++) {
 		pipes.pos_pipes[i][0] -= pipeSpeed;
 		graphics.advancedRenderTexture(pipe, pipes.pos_pipes[i][0], pipes.pos_pipes[i][2], SDL_FLIP_VERTICAL);
@@ -45,22 +45,39 @@ void pipeRunning(Pipe& pipes, Graphics& graphics, SDL_Texture* pipe, const int p
 			graphics.renderTexture(pipe, pipes.pos_pipes[i][0], pipes.pos_pipes[i][2] - pipes.pipeH);
 		}
 	}
+	for (int i = 0; i < 3; i++) {
+		if (items[i].isActive) {
+			items[i].posX = (pipes.pos_pipes[i][0] + pipes.pos_pipes[i + 1][0] + pipes.pipeW) / 2 - items[i].width / 2;
+			items[i].posY = (pipes.pos_pipes[i][1] + pipes.pos_pipes[i + 1][2] + pipes.pipeH) / 2 - items[i].height / 2;
+			graphics.renderTexture(graphics.loadTexture(ITEM_PATH), items[i].posX, items[i].posY);
+		}
+	}
 
 	pipes.scoreMeter -= pipeSpeed;
 
-	if (pipes.pos_pipes[0][0] + pipes.pipeW < 0) {
+	if (pipes.pos_pipes[0][0] + pipes.pipeW + pipes.pipeDistance + items[1].width < 0) {
 		for (int i = 0; i < 3; i++) {
 			pipes.pos_pipes[i] = pipes.pos_pipes[i + 1];
+			if (i != 2) {
+				items[i] = items[i + 1];
+				items[i].associatedPipeIndex = i;
+			}
 		}
-		pipes.randomPositionGenerator();
+		pipes.randomPositionGenerator();	
 		pipes.pos_pipes[3][0] = pipes.pos_pipes[2][0] + pipes.pipeW + pipes.pipeDistance;
 		pipes.pos_pipes[3][1] = pipes.pipe1Y;
 		pipes.pos_pipes[3][2] = pipes.pipe2Y;
+
+		items[2].reset((pipes.pos_pipes[2][0] + pipes.pos_pipes[3][0] + pipes.pipeW) / 2 - items[2].width / 2,
+			(pipes.pos_pipes[2][1] + pipes.pos_pipes[3][2] + pipes.pipeH) / 2 - items[2].height / 2);
+		int chance = rand() % 101; 
+		items[2].isActive = (chance <= ITEM_DROP_CHANCE);
+		items[2].associatedPipeIndex = 2;
 	}
 	
 }
 
-void startGameSetUp(Pipe& pipes) {
+void startGameSetUp(Pipe& pipes, vector<Item>& items) {
 	for (int i = 0; i < 4; i++) {
 		pipes.randomPositionGenerator();
 		pipes.pos_pipes[i][0] = SCREEN_WIDTH;
@@ -71,18 +88,26 @@ void startGameSetUp(Pipe& pipes) {
 		}
 		pipes.scoreMeter = SCREEN_WIDTH + pipes.pipeW / 2;
 	}
+	for (int i = 0; i < 3; i++) {
+		items[i].reset((pipes.pos_pipes[i][0] + pipes.pos_pipes[i + 1][0] + pipes.pipeW) / 2 - items[i].width / 2,
+			(pipes.pos_pipes[i][1] + pipes.pos_pipes[i + 1][2] + pipes.pipeH) / 2 - items[i].height / 2);
+		int chance = rand() % 101;
+		items[i].isActive = (chance <= ITEM_DROP_CHANCE);
+		items[i].associatedPipeIndex = i;
+	}
 }
 
-void resetGame(Bird& bird) {
+void resetGame(Bird& bird, int& lastScoreCheck) {
 	cout << "Score: " << bird.score << endl;
 	bird.birdPosX = SCREEN_WIDTH / 5;
 	bird.birdPosY = SCREEN_HEIGHT /3;
 	bird.vel = 0;
 	bird.score = 0;
 	bird.birdAngle = 0;
+	lastScoreCheck = 0;
 }
 
-void checkCollision(Pipe& pipes, Bird& bird, bool& prepareGame) {
+void checkCollision(Pipe& pipes, Bird& bird, bool& prepareGame, vector<Item>& items) {
 	int boundingPosX1 = bird.birdPosX, boundingPosY1 = bird.birdPosY;
 	int boundingPosX2 = boundingPosX1 + bird.widthBird, boundingPosY2 = boundingPosY1 + bird.heightBird;
 
@@ -92,6 +117,16 @@ void checkCollision(Pipe& pipes, Bird& bird, bool& prepareGame) {
 	}
 
 	SDL_Rect birdRect = { bird.birdPosX, bird.birdPosY, bird.widthBird, bird.heightBird };
+
+	for (int i = 0; i < 3; i++) {
+		if (items[i].isActive) {
+			SDL_Rect itemRect = { items[i].posX, items[i].posY, items[i].width, items[i].height };
+			if (SDL_HasIntersection(&birdRect, &itemRect)) {
+				items[i].isActive = false;
+				bird.score++;
+			}
+		}
+	}
 
 	for (int i = 0; i < 4; i++) {
 		SDL_Rect pipe1Rect = { pipes.pos_pipes[i][0], pipes.pos_pipes[i][1], pipes.pipeW, pipes.pipeH };
